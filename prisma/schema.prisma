@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  name          String?
+  email         String   @unique
+  passwordHash  String
+  createdAt     DateTime @default(now())
+
+  progress         Progress[]
+  exerciseAttempts ExerciseAttempt[]
+  savedContent     SavedContent[]
+}
+
+model Language {
+  code String @id // e.g. "en", "pt", "zh"
+  name String // display name, e.g. "English"
+
+  progress         Progress[]
+  exerciseAttempts ExerciseAttempt[]
+  savedContent     SavedContent[]
+}
+
+model Progress {
+  id                 String   @id @default(cuid())
+  userId             String
+  languageCode       String
+  exercisesCompleted Int      @default(0)
+  correctCount       Int      @default(0)
+  streak             Int      @default(0)
+  lastStudiedAt      DateTime?
+  updatedAt          DateTime @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  language Language @relation(fields: [languageCode], references: [code], onDelete: Cascade)
+
+  @@unique([userId, languageCode])
+}
+
+model ExerciseAttempt {
+  id           String   @id @default(cuid())
+  userId       String
+  languageCode String
+  exerciseId   String // groups multiple attempts belonging to the same generated exercise set
+  sourceText   String
+  question     String
+  userAnswer   String
+  correct      Boolean
+  createdAt    DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  language Language @relation(fields: [languageCode], references: [code], onDelete: Cascade)
+}
+
+model SavedContent {
+  id           String   @id @default(cuid())
+  userId       String
+  languageCode String
+  title        String
+  sourceType   String // "news" | "literature" | "sentence"
+  sourceUrl    String?
+  text         String
+  createdAt    DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  language Language @relation(fields: [languageCode], references: [code], onDelete: Cascade)
+}

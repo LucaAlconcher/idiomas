@@ -32,10 +32,20 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
 
+# Claude Code / agent tooling (local only)
+/.claude/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/app/generated/prisma
+
+# base de datos local (SQLite, ya no se usa en producción)
+/prisma/dev.db
+/dev.db
