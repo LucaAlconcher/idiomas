@@ -7,10 +7,12 @@ import { recordExerciseAttempt } from "@/lib/progress";
 export async function GET() {
   const userId = await getCurrentUserId();
 
-  const progress = await prisma.progress.findMany({
-    where: { userId },
-    include: { language: true },
-  });
+  const progress = await prisma.progress
+    .findMany({
+      where: { userId },
+      include: { language: true },
+    })
+    .catch(() => []);
 
   return NextResponse.json({ progress });
 }
@@ -35,6 +37,12 @@ export async function POST(request: Request) {
   const progress = await recordExerciseAttempt({
     userId,
     ...parsed.data,
+  }).catch((error) => {
+    console.warn(
+      "[api/progress] No se pudo guardar el intento (¿falta configurar la base de datos?):",
+      error instanceof Error ? error.message : error
+    );
+    return null;
   });
 
   return NextResponse.json({ progress });

@@ -14,9 +14,12 @@ const BADGES: Record<string, string> = {
 export default async function DashboardPage() {
   const userId = await getCurrentUserId();
 
-  const progressRows = await prisma.progress.findMany({
-    where: { userId },
-  });
+  // Si todavía no hay una base de datos real conectada (desarrollo local
+  // sin DATABASE_URL configurada), se sigue mostrando el dashboard sin
+  // progreso en vez de romper la página.
+  const progressRows = await prisma.progress
+    .findMany({ where: { userId } })
+    .catch(() => []);
   const progressByLanguage = new Map(progressRows.map((p) => [p.languageCode, p]));
 
   return (

@@ -141,7 +141,17 @@ export function ReadingWorkspace({
       <ReadAloud text={text} locale={ttsLocale} onWordClick={lookupWord} />
 
       {selectedWord && (
-        <div className={`${card} p-4 text-sm text-foreground`}>
+        <div className={`${card} relative p-4 pr-10 text-sm text-foreground`}>
+          <button
+            onClick={() => {
+              setSelectedWord(null);
+              setDefinitions(null);
+            }}
+            aria-label="Cerrar definición"
+            className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full text-muted transition hover:bg-accent-soft hover:text-accent"
+          >
+            ✕
+          </button>
           <p className="font-semibold text-accent">{selectedWord}</p>
           {loadingDefinition && <p className="mt-1 text-muted">Buscando definición...</p>}
           {!loadingDefinition && definitions && definitions.length === 0 && (

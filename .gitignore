@@ -49,3 +49,6 @@ next-env.d.ts
 # base de datos local (SQLite, ya no se usa en producción)
 /prisma/dev.db
 /dev.db
+
+.vercel
+.env*

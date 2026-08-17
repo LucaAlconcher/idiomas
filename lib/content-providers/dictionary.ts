@@ -1,6 +1,7 @@
 import * as cheerio from "cheerio";
 import type { AnyNode } from "domhandler";
 import { getLanguage } from "@/lib/languages";
+import { translateDefinitionsToSpanish } from "@/lib/gemini";
 
 export type DictionaryDefinition = {
   partOfSpeech: string;
@@ -95,5 +96,11 @@ export async function fetchDefinition(
     if (parsed.definitions.length > 0) results.push(parsed);
   });
 
-  return results;
+  // Cambridge no ofrece pares en español para todos los idiomas (p. ej.
+  // portuguese-english o chinese-simplified-english solo traducen al inglés,
+  // y el diccionario monolingüe de inglés está en inglés). Para mostrar
+  // siempre las definiciones en español, se traducen con Gemini; si no está
+  // configurado o falla, se degrada mostrando el texto original.
+  const translated = await translateDefinitionsToSpanish(word, results);
+  return translated ?? results;
 }
